@@ -6,9 +6,16 @@ const form = reactive({
   email: '',
   password: '',
 });
-
-const Submit = () => {
-  console.log(form);
+const errors = ref([]);
+const Submit = async() => {
+try {
+  const { data} = await $fetch('http://127.0.0.1:8000/api/login', {
+    method: 'POST',
+    body: { ...form },
+  });
+} catch (error) {
+  errors.value = error.data.errors;
+}
 };
 </script>
 
@@ -25,12 +32,14 @@ const Submit = () => {
             <FormInputText id="email" type="email" :modalValue="form.email" @update:modalValue="form.email = $event" />
             <FormLabel for="email">Your Email</FormLabel>
           </div>
+          <span v-if="errors.email" class="text-red-600 ">{{ errors.email[0] }}</span>
 
           <!-- Password Field -->
           <div class="relative z-0 w-full mb-5 group">
             <InputText id="password" type="password" :modalValue="form.password" @update:modalValue="form.password = $event" />
             <FormLabel for="password">Password</FormLabel>
           </div>
+          <span v-if="errors.password" class="text-red-600 ">{{ errors.password[0] }}</span>
 
           <!-- Remember Me Checkbox -->
           <div class="flex items-center">
@@ -38,6 +47,7 @@ const Submit = () => {
             <label for="remember" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Remember me</label>
           </div>
 
+          <span></span>
           <!-- Login Button -->
           <ButtonPrimary>Login</ButtonPrimary>
         </form>
